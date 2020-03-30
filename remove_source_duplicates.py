@@ -1,19 +1,19 @@
 from argparse import ArgumentParser
 import os
-import shutil
+from utils import create_logger, list_subtree, is_image, get_image_date
 from tqdm import tqdm
-from utils import list_subtree, is_image, get_image_date, create_logger
+import filecmp
 
 
 def _main():
-    out_dir = args.out_dir
+    out_dir = args.dst_dir
     if not os.path.exists(out_dir):
-        os.mkdir(out_dir)
+        raise ValueError("Destination directory does not exist")
 
     log_dir = args.log_dir if args.log_dir is not None else out_dir
     logger = create_logger(log_dir, "image_organizer")
 
-    logger.info("started new session")
+    logger.info("started new remove-duplicate session")
 
     print("Listing subtree...")
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
@@ -25,10 +25,8 @@ def _main():
                 img_files.append(f)
         except OSError:
             logger.warning(f"OS error while checking if '{f}' is an image")
-    # TODO: remove
-    # img_files = [f for f in all_files if is_image(f)]
 
-    for src_file in tqdm(img_files, desc="Organizing"):
+    for src_file in tqdm(img_files, desc="Removing duplicates"):
         try:
             date_taken = get_image_date(src_file)
         except ValueError:
@@ -36,37 +34,25 @@ def _main():
             continue
 
         dst_dir = os.path.join(out_dir, f"{date_taken.year:04}_{date_taken.month:02}")
-        if not os.path.exists(dst_dir):
-            os.mkdir(dst_dir)
         dst_filename = os.path.basename(src_file)
         dst_file = os.path.join(dst_dir, dst_filename)
 
         if os.path.exists(dst_file):
-            logger.warning(f"failed to handle '{src_file}' - destination file '{dst_file}' already exists")
-            continue
-
-        if args.dry_run:
-            if args.copy:
-                logger.info(f"Would copy '{src_file}' to '{dst_file}'")
-            else:
-                logger.info(f"Would move '{src_file}' to '{dst_file}'")
-        else:
-            if args.copy:
-                logger.info(f"Copy '{src_file}' to '{dst_file}'")
-                shutil.copyfile(src_file, dst_file)
-            else:
-                logger.info(f"Move '{src_file}' to '{dst_file}'")
-                shutil.move(src_file, dst_file)
+            binary_equals = filecmp.cmp(src_file, dst_file)
+            if binary_equals:
+                if args.dry_run:
+                    logger.info(f"Would remove '{src_file}'")
+                else:
+                    logger.info(f"Remove source duplicate '{src_file}'")
+                    os.remove(src_file)
 
 
 if __name__ == '__main__':
     arg_parser = ArgumentParser()
     arg_parser.add_argument("source_dir", help="path to source image directory")
-    arg_parser.add_argument("out_dir", help="path to output directory")
+    arg_parser.add_argument("dst_dir", help="path to destination directory")
     arg_parser.add_argument("--recursive", "-r", action="store_true",
                             help="indicate to apply recursively on source directory")
-    arg_parser.add_argument("--copy", "-c", action="store_true",
-                            help="indicate to copy file instead of moving them")
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
                             help="indicate to run try run (i.e. print to console what would have been done")
     arg_parser.add_argument("--log-dir", help="path to logs directory")
