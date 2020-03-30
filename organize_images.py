@@ -5,6 +5,7 @@ import os
 import imghdr
 import shutil
 import logging
+from tqdm import tqdm
 
 
 def list_subtree(root_dir, recursive):
@@ -67,7 +68,7 @@ def _main():
 
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
     img_files = [f for f in all_files if is_image(f)]
-    for src_file in img_files:
+    for src_file in tqdm(img_files, desc="Organizing"):
         try:
             date_taken = get_image_date(src_file)
         except ValueError:
