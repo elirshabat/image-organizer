@@ -1,0 +1,2 @@
+ExifRead
+tqdm
