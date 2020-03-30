@@ -70,7 +70,15 @@ def _main():
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
     print("Filtering non-image files...")
-    img_files = [f for f in all_files if is_image(f)]
+    img_files = []
+    for f in all_files:
+        try:
+            if is_image(f):
+                img_files.append(f)
+        except OSError:
+            logger.warning(f"OS error while checking if '{f}' is an image")
+    # TODO: remove
+    # img_files = [f for f in all_files if is_image(f)]
 
     for src_file in tqdm(img_files, desc="Organizing"):
         try:
