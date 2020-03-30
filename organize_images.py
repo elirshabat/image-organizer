@@ -66,8 +66,12 @@ def _main():
 
     logger.info("started new session")
 
+    print("Listing subtree...")
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
+
+    print("Filtering non-image files...")
     img_files = [f for f in all_files if is_image(f)]
+
     for src_file in tqdm(img_files, desc="Organizing"):
         try:
             date_taken = get_image_date(src_file)
