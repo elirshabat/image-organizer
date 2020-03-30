@@ -69,9 +69,8 @@ def _main():
     print("Listing subtree...")
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
-    print("Filtering non-image files...")
     img_files = []
-    for f in all_files:
+    for f in tqdm(all_files, desc="Filtering non-image files"):
         try:
             if is_image(f):
                 img_files.append(f)
