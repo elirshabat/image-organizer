@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import imghdr
 import shutil
+import logging
 
 
 def list_subtree(root_dir, recursive):
@@ -34,10 +35,35 @@ def get_image_date(img_file):
             raise ValueError(f"Cannot get original time from image {img_file}")
 
 
+def create_logger(log_dir, logger_name):
+    logger = logging.getLogger(logger_name)
+    logger.setLevel(logging.DEBUG)
+    # create file handler which logs even debug messages
+    # TODO remove: log_filename = datetime.now().strftime("%Y_%m_%d-%H_%M_%S-organization.log")
+    fh = logging.FileHandler(os.path.join(log_dir, "image_organization.log"))
+    fh.setLevel(logging.DEBUG)
+    # create console handler with a higher log level
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # create formatter and add it to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    ch.setFormatter(formatter)
+    # add the handlers to the logger
+    logger.addHandler(fh)
+    logger.addHandler(ch)
+    return logger
+
+
 def _main():
     out_dir = args.out_dir
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
+
+    log_dir = args.log_dir if args.log_dir is not None else out_dir
+    logger = create_logger(log_dir, "image_organizer")
+
+    logger.info("started new session")
 
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
     img_files = [f for f in all_files if is_image(f)]
@@ -45,7 +71,7 @@ def _main():
         try:
             date_taken = get_image_date(src_file)
         except ValueError:
-            print(f"WARNING - failed to get date from {src_file}")
+            logger.warning(f"failed to get date from '{src_file}'")
             continue
 
         dst_dir = os.path.join(out_dir, f"{date_taken.year:04}_{date_taken.month:02}")
@@ -55,20 +81,20 @@ def _main():
         dst_file = os.path.join(dst_dir, dst_filename)
 
         if os.path.exists(dst_file):
-            print(f"WARNING - destination file already exists - {dst_file}")
+            logger.warning(f"failed to handle '{src_file}' - destination file '{dst_file}' already exists")
             continue
 
         if args.dry_run:
             if args.copy:
-                print(f"Would copy {src_file} to {dst_file}")
+                logger.info(f"Would copy '{src_file}' to '{dst_file}'")
             else:
-                print(f"Would move {src_file} to {dst_file}")
+                logger.info(f"Would move '{src_file}' to '{dst_file}'")
         else:
             if args.copy:
-                print(f"Copy {src_file} to {dst_file}")
+                logger.info(f"Copy '{src_file}' to '{dst_file}'")
                 shutil.copyfile(src_file, dst_file)
             else:
-                print(f"Move {src_file} to {dst_file}")
+                logger.info(f"Move '{src_file}' to '{dst_file}'")
                 shutil.move(src_file, dst_file)
 
 
@@ -82,5 +108,6 @@ if __name__ == '__main__':
                             help="indicate to copy file instead of moving them")
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
                             help="indicate to run try run (i.e. print to console what would have been done")
+    arg_parser.add_argument("--log-dir", help="path to logs directory")
     args = arg_parser.parse_args()
     _main()
