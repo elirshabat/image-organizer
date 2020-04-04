@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import os
 import shutil
 from tqdm import tqdm
-from utils import list_subtree, is_image, get_image_date, create_logger
+from utils import list_subtree, is_media, get_media_time, create_logger
 
 
 def _main():
@@ -18,24 +18,22 @@ def _main():
     print("Listing subtree...")
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
-    img_files = []
+    media_files = []
     for f in tqdm(all_files, desc="Filtering non-image files"):
         try:
-            if is_image(f):
-                img_files.append(f)
+            if is_media(f):
+                media_files.append(f)
         except OSError:
-            logger.warning(f"OS error while checking if '{f}' is an image")
-    # TODO: remove
-    # img_files = [f for f in all_files if is_image(f)]
+            logger.warning(f"OS error while checking if '{f}' is a media file")
 
-    for src_file in tqdm(img_files, desc="Organizing"):
+    for src_file in tqdm(media_files, desc="Organizing Media"):
         try:
-            date_taken = get_image_date(src_file)
+            time_taken = get_media_time(src_file)
         except ValueError:
-            logger.warning(f"failed to get date from '{src_file}'")
+            logger.warning(f"failed to get time from '{src_file}'")
             continue
 
-        dst_dir = os.path.join(out_dir, f"{date_taken.year:04}_{date_taken.month:02}")
+        dst_dir = os.path.join(out_dir, f"{time_taken.year:04}_{time_taken.month:02}")
         if not os.path.exists(dst_dir):
             os.mkdir(dst_dir)
         dst_filename = os.path.basename(src_file)

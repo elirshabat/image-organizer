@@ -1,6 +1,6 @@
 from argparse import ArgumentParser
 import os
-from utils import create_logger, list_subtree, is_image, get_image_date
+from utils import create_logger, list_subtree, is_media, get_media_time
 from tqdm import tqdm
 import filecmp
 
@@ -18,17 +18,17 @@ def _main():
     print("Listing subtree...")
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
-    img_files = []
+    media_files = []
     for f in tqdm(all_files, desc="Filtering non-image files"):
         try:
-            if is_image(f):
-                img_files.append(f)
+            if is_media(f):
+                media_files.append(f)
         except OSError:
             logger.warning(f"OS error while checking if '{f}' is an image")
 
-    for src_file in tqdm(img_files, desc="Removing duplicates"):
+    for src_file in tqdm(media_files, desc="Removing duplicates"):
         try:
-            date_taken = get_image_date(src_file)
+            date_taken = get_media_time(src_file)
         except ValueError:
             logger.warning(f"failed to get date from '{src_file}'")
             continue

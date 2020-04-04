@@ -3,6 +3,12 @@ import exifread
 from datetime import datetime
 import imghdr
 import logging
+# import time
+
+video_file_extensions = (".webm", ".mkv", ".flv", ".vob", ".ogv", ".ogg", ".drc", ".gif", ".gifv", ".mng", ".avi",
+                         ".mts", ".m2ts", ".ts", ".mov", ".qt", ".wmv", ".yuv", ".rm", ".rmvb", ".asf", ".amv", ".mp4",
+                         ".m4p", ".m4v", ".mpg", ".mpeg", ".m2v", ".m4v", ".svi", ".3gp", ".3g2", ".mxf", ".roq",
+                         ".nsv", ".flv", ".f4v", ".f4p", ".f4a", ".f4b")
 
 
 def list_subtree(root_dir, recursive):
@@ -23,14 +29,28 @@ def is_image(file_path):
     return imghdr.what(file_path) is not None
 
 
-def get_image_date(img_file):
+def is_video(file_path):
+    ext = os.path.splitext(file_path)[1]
+    return ext.lower() in video_file_extensions
+
+
+def is_media(file_path):
+    return is_video(file_path) or is_image(file_path)
+
+
+# def get_modification_time(file_path):
+#     mod_time_float = os.path.getmtime(file_path)
+#     return datetime.strptime(time.ctime(mod_time_float), "%a %b %d %H:%M:%S %Y")
+
+
+def get_media_time(img_file):
     with open(img_file, 'rb') as fh:
         tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
         if "EXIF DateTimeOriginal" in tags:
             date_taken = tags["EXIF DateTimeOriginal"]
             return datetime.strptime(str(date_taken), "%Y:%m:%d %H:%M:%S")
         else:
-            raise ValueError(f"Cannot get original time from image {img_file}")
+            raise ValueError("Media file does not contain creation time")
 
 
 def create_logger(log_dir, logger_name):
