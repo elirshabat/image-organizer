@@ -19,13 +19,14 @@ def _main():
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
     media_files = []
-    for f in tqdm(all_files, desc="Filtering non-image files"):
+    for f in tqdm(all_files, desc="Filtering non-media files"):
         try:
             if is_media(f):
                 media_files.append(f)
         except OSError:
             logger.warning(f"OS error while checking if '{f}' is an image")
 
+    n_duplicates_removed = 0
     for src_file in tqdm(media_files, desc="Removing duplicates"):
         try:
             date_taken = get_media_time(src_file)
@@ -45,6 +46,9 @@ def _main():
                 else:
                     logger.info(f"Remove source duplicate '{src_file}'")
                     os.remove(src_file)
+                    n_duplicates_removed += 1
+
+    print(f"Done - removed {n_duplicates_removed} duplicates")
 
 
 if __name__ == '__main__':

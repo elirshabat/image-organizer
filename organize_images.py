@@ -19,7 +19,7 @@ def _main():
     all_files = list_subtree(args.source_dir, recursive=args.recursive)
 
     media_files = []
-    for f in tqdm(all_files, desc="Filtering non-image files"):
+    for f in tqdm(all_files, desc="Filtering non-media files"):
         try:
             if is_media(f):
                 media_files.append(f)
