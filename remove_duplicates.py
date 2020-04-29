@@ -34,7 +34,7 @@ def _main():
 
     hash_dict = dict()
 
-    n_duplicates_removed = 0
+    n_duplicates_found = n_duplicates_removed = 0
     for file_path in tqdm(media_files, desc="Removing duplicates"):
         h = file_hash(file_path)
         if h in hash_dict:
@@ -45,6 +45,7 @@ def _main():
                     dup_file = candidate_file
                     break
             if dup_file is not None:
+                n_duplicates_found += 1
                 if args.dry_run:
                     logger.info(f"Would remove {file_path} - duplication of {dup_file}")
                 else:
@@ -56,7 +57,7 @@ def _main():
         else:
             hash_dict[h] = [file_path]
 
-    print(f"Done - removed {n_duplicates_removed} duplicates")
+    print(f"Done - removed {n_duplicates_removed}/{n_duplicates_found} duplicates")
 
 
 if __name__ == '__main__':
