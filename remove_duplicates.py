@@ -6,9 +6,12 @@ import filecmp
 from hashlib import md5
 
 
-def file_hash(file_path):
-    with open(file_path, 'rb') as f:
-        return md5(f.read()).hexdigest()
+def file_hash(file_path, chunk_size=2**24):
+    hash_md5 = md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
 
 
 def _main():
