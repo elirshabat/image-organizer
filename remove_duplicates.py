@@ -1,17 +1,8 @@
 from argparse import ArgumentParser
 import os
-from utils import create_logger, list_subtree, is_media, get_media_time
+from utils import create_logger, list_subtree, is_media, file_hash
 from tqdm import tqdm
 import filecmp
-from hashlib import md5
-
-
-def file_hash(file_path, chunk_size=2**24):
-    hash_md5 = md5()
-    with open(file_path, "rb") as f:
-        for chunk in iter(lambda: f.read(chunk_size), b""):
-            hash_md5.update(chunk)
-    return hash_md5.hexdigest()
 
 
 def _main():

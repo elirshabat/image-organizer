@@ -1,4 +1,6 @@
 import os
+from hashlib import md5
+
 import exifread
 from datetime import datetime
 import imghdr
@@ -71,3 +73,14 @@ def create_logger(log_dir, logger_name):
     logger.addHandler(fh)
     logger.addHandler(ch)
     return logger
+
+
+def file_hash(file_path, chunk_size=2**24):
+    """
+    Compute the MD5 hash of the given file.
+    """
+    hash_md5 = md5()
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
