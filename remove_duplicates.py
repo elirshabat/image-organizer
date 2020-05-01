@@ -6,17 +6,20 @@ import filecmp
 
 
 def _main():
-    media_dir = args.media_dir
-    if not os.path.exists(media_dir):
-        raise ValueError("Media directory does not exist")
+    media_dirs = args.media_dirs
+    for media_dir in media_dirs:
+        if not os.path.exists(media_dir):
+            raise ValueError(f"Media directory '{media_dir}' does not exist")
 
-    log_dir = args.log_dir if args.log_dir is not None else media_dir
+    log_dir = args.log_dir if args.log_dir is not None else media_dirs[0]
     logger = create_logger(log_dir, "duplicate_detector")
 
     logger.info("started new remove-duplicate session")
 
     print("Listing subtree...")
-    all_files = list_subtree(media_dir, recursive=args.recursive)
+    all_files = []
+    for media_dir in media_dirs:
+        all_files.extend(list_subtree(media_dir, recursive=args.recursive))
 
     media_files = []
     for f in tqdm(all_files, desc="Filtering non-media files"):
@@ -56,7 +59,7 @@ def _main():
 
 if __name__ == '__main__':
     arg_parser = ArgumentParser()
-    arg_parser.add_argument("media_dir", help="directory with duplicates to remove")
+    arg_parser.add_argument("media_dirs", nargs='+', help="directories with duplicates to remove (order is important)")
     arg_parser.add_argument("--recursive", "-r", action="store_true",
                             help="indicate to apply recursively on source directory")
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
