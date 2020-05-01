@@ -28,7 +28,7 @@ def _main():
 
     for src_file in tqdm(media_files, desc="Organizing Media"):
         try:
-            time_taken = get_media_time(src_file)
+            time_taken = get_media_time(src_file, args.valid_mod_time)
         except ValueError:
             logger.warning(f"failed to get time from '{src_file}'")
             continue
@@ -68,5 +68,7 @@ if __name__ == '__main__':
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
                             help="indicate to run try run (i.e. print to console what would have been done")
     arg_parser.add_argument("--log-dir", help="path to logs directory")
+    arg_parser.add_argument("--valid-mod-time", "--mod", action='store_true',
+                            help="Indicate to use file's modification time if the EXIF does not contain creation time")
     args = arg_parser.parse_args()
     _main()
