@@ -3,6 +3,7 @@ import os
 import shutil
 from tqdm import tqdm
 from utils import list_subtree, is_media, get_media_time, create_logger
+import filecmp
 
 
 def _main():
@@ -40,7 +41,17 @@ def _main():
         dst_file = os.path.join(dst_dir, dst_filename)
 
         if os.path.exists(dst_file):
-            logger.warning(f"failed to handle '{src_file}' - destination file '{dst_file}' already exists")
+            if filecmp.cmp(src_file, dst_file):
+                if not args.copy:
+                    if args.dry_run:
+                        logger.info(f"Would remove '{src_file}' - duplicate of '{dst_file}'")
+                    else:
+                        os.remove(src_file)
+                        logger.info(f"Remove '{src_file}' - duplicate of '{dst_file}'")
+                else:
+                    logger.info(f"Ignoring '{src_file}' - duplicate of '{dst_file}'")
+            else:
+                logger.warning(f"failed to handle '{src_file}' - destination file '{dst_file}' already exists")
             continue
 
         if args.dry_run:
