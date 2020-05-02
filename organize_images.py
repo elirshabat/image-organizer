@@ -11,8 +11,8 @@ def _main():
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
 
-    log_dir = args.log_dir if args.log_dir is not None else out_dir
-    logger = create_logger(log_dir, "image_organizer")
+    log_file = args.log_file if args.log_file is not None else os.path.join(out_dir, "image_organization.log")
+    logger = create_logger(log_file, "image_organizer")
 
     logger.info("started new session")
 
@@ -78,7 +78,7 @@ if __name__ == '__main__':
                             help="indicate to copy file instead of moving them")
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
                             help="indicate to run try run (i.e. print to console what would have been done")
-    arg_parser.add_argument("--log-dir", help="path to logs directory")
+    arg_parser.add_argument("--log-file", help="path to log file (default is destination folder)")
     arg_parser.add_argument("--valid-mod-time", "--mod", action='store_true',
                             help="Indicate to use file's modification time if the EXIF does not contain creation time")
     args = arg_parser.parse_args()

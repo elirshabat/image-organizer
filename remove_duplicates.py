@@ -11,8 +11,8 @@ def _main():
         if not os.path.exists(media_dir):
             raise ValueError(f"Media directory '{media_dir}' does not exist")
 
-    log_dir = args.log_dir if args.log_dir is not None else media_dirs[0]
-    logger = create_logger(log_dir, "duplicate_detector")
+    log_file = args.log_file if args.log_file is not None else os.path.join(media_dirs[0], "image_organization.log")
+    logger = create_logger(log_file, "duplicate_detector")
 
     logger.info("started new remove-duplicate session")
 
@@ -64,6 +64,6 @@ if __name__ == '__main__':
                             help="indicate to apply recursively on source directory")
     arg_parser.add_argument("--dry-run", "-d", action="store_true",
                             help="indicate to run try run (i.e. print to console what would have been done")
-    arg_parser.add_argument("--log-dir", help="path to logs directory")
+    arg_parser.add_argument("--log-file", help="path to log file (default to the first media directory)")
     args = arg_parser.parse_args()
     _main()

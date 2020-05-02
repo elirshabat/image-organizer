@@ -60,12 +60,13 @@ def get_media_time(img_file, valid_mod_time=False):
         raise ValueError("Failed to get creation time")
 
 
-def create_logger(log_dir, logger_name):
+def create_logger(log_file, logger_name):
     logger = logging.getLogger(logger_name)
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     # TODO remove: log_filename = datetime.now().strftime("%Y_%m_%d-%H_%M_%S-organization.log")
-    fh = logging.FileHandler(os.path.join(log_dir, "image_organization.log"), encoding='utf-8')
+    # fh = logging.FileHandler(os.path.join(log_dir, "image_organization.log"), encoding='utf-8')
+    fh = logging.FileHandler(log_file, encoding='utf-8')
     fh.setLevel(logging.DEBUG)
     # create console handler with a higher log level
     ch = logging.StreamHandler()
