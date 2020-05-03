@@ -1,0 +1,11 @@
+# Install Linux prerequisites (need by Dlib):
+sudo apt-get install build-essential cmake pkg-config
+sudo apt-get install libx11-dev libatlas-base-dev
+sudo apt-get install libgtk-3-dev libboost-python-dev
+sudo apt-get install libopenblas-dev liblapack-dev
+
+# Install python3.X-dev (replace X with the relevant version)
+sudo apt-get install python3.X-dev
+
+# Install the face_recognition to enable AI support
+pip install face_recognition
