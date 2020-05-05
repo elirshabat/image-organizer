@@ -17,7 +17,8 @@ def _main():
     img_files = [f for f in all_files if is_image(f)]
 
     face_names, face_encodings = [], []
-    for name, face_file in faces_dict.items():
+    for name, face_filename in faces_dict.items():
+        face_file = os.path.join(seed_dir, face_filename)
         face_image = face_recognition.load_image_file(face_file)
         enc = face_recognition.face_encodings(face_image)[0]
         face_names.append(name)
