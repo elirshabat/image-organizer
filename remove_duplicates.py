@@ -33,7 +33,12 @@ def _main():
 
     n_duplicates_found = n_duplicates_removed = 0
     for file_path in tqdm(media_files, desc="Removing duplicates"):
-        h = file_hash(file_path)
+        try:
+            h = file_hash(file_path)
+        except PermissionError:
+            logger.error(f"Permission error while computing the hash of '{file_path}'")
+            continue
+
         if h in hash_dict:
             dup_candidates = hash_dict[h]
             dup_file = None
