@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import os
 import shutil
 from tqdm import tqdm
-from utils import list_subtree, is_media, get_media_time, create_logger
+from utils import list_subtree, is_media, get_media_time, create_logger, delete_empty_dirs
 import filecmp
 
 
@@ -69,6 +69,9 @@ def _main():
                     shutil.move(src_file, dst_file)
             except:
                 logger.error(f"Error copying/moving {src_file} -> {dst_file}")
+    
+    if not args.copy and not args.dry_run:
+        delete_empty_dirs(args.source_dir, args.recursive)
 
 
 if __name__ == '__main__':

@@ -22,8 +22,23 @@ def list_subtree(root_dir, recursive):
                 subtree_files.append(os.path.abspath(os.path.join(dir, file)))
         return subtree_files
     else:
-        all_paths = [os.path.join(root_dir, filename) for filename in os.listdir(root_dir)]
+        all_paths = [os.path.join(root_dir, filename)
+                                  for filename in os.listdir(root_dir)]
         return [path for path in all_paths if os.path.isfile(path)]
+
+
+def list_subtree_dirs(root_dir, recursive):
+    if os.path.isfile(root_dir):
+        return []
+    elif recursive:
+        subtree_dirs = []
+        for curr_dir, _, _ in os.walk(root_dir):
+            subtree_dirs.append(curr_dir)
+        return subtree_dirs
+    else:
+        all_paths = [os.path.join(root_dir, filename)
+                                  for filename in os.listdir(root_dir)]
+        return [path for path in all_paths if os.path.isdir(path)]
 
 
 def is_image(file_path):
@@ -72,7 +87,8 @@ def create_logger(log_file, logger_name):
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
     # create formatter and add it to the handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     ch.setFormatter(formatter)
     # add the handlers to the logger
@@ -90,3 +106,17 @@ def file_hash(file_path, chunk_size=2**24):
         for chunk in iter(lambda: f.read(chunk_size), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
+
+
+def delete_empty_dirs(root_dir, recursive):
+    if not os.path.isdir(root_dir):
+        raise ValueError("First input is not a directory")
+    
+    for name in os.listdir(root_dir):
+        path = os.path.join(root_dir, name)
+        if os.path.isdir(path):
+            if recursive:
+                delete_empty_dirs(path, recursive=True)
+            
+            if len(os.listdir(path)) == 0:
+                os.rmdir(path)
