@@ -131,6 +131,9 @@ dmypy.json
 # Pycharm
 .idea
 
+# VSCode
+/.vscode
+
 # Tree
 /Temp
 /test
