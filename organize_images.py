@@ -63,7 +63,7 @@ def _main():
             try:
                 if args.copy:
                     logger.info(f"Copy '{src_file}' to '{dst_file}'")
-                    shutil.copyfile(src_file, dst_file)
+                    shutil.copy2(src_file, dst_file)
                 else:
                     logger.info(f"Move '{src_file}' to '{dst_file}'")
                     shutil.move(src_file, dst_file)
