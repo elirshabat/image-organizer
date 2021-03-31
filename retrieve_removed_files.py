@@ -4,7 +4,6 @@ from tqdm import tqdm
 import os
 import shutil
 
-# image_organizer - INFO - Remove \'(.+)\' - duplicate of \'(.+)\'
 
 def _main():
     log_file = args.log_file
@@ -24,8 +23,6 @@ def _main():
             dst_dir = os.path.abspath(os.path.dirname(dst_file))
             os.makedirs(dst_dir, exist_ok=True)
             shutil.copyfile(src_file, dst_file)
-
-
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import os
 import shutil
 from tqdm import tqdm
-from utils import list_subtree, is_media, get_media_time, create_logger, delete_empty_dirs
+from mediaorg.utils import list_subtree, is_media, get_media_time, create_logger, delete_empty_dirs
 import filecmp
 
 
